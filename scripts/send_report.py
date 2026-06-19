@@ -29,6 +29,7 @@ import urllib.error
 DEFAULT_TO = "tusvo.dev@gmail.com"
 DEFAULT_FROM = "Gold Watch <onboarding@resend.dev>"
 
+headers = {"User-Agent": "Mozilla/5.0 (gold-watch)", **headers}
 
 def _post(url, headers, payload):
     data = json.dumps(payload).encode("utf-8")
