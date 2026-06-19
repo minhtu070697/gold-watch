@@ -1,24 +1,5 @@
 #!/usr/bin/env python3
-"""Send the daily gold report by email over an HTTPS API.
-
-Raw SMTP (ports 25/465/587) is blocked in the Claude Code cloud sandbox, but
-outbound HTTPS (443) works, so we deliver mail through a transactional email
-API instead. No third-party Python packages required (stdlib only).
-
-Provider is chosen automatically from whichever API key env var is present:
-  - RESEND_API_KEY    -> https://api.resend.com   (recommended, simplest)
-  - SENDGRID_API_KEY  -> https://api.sendgrid.com
-
-Env vars:
-  RESEND_API_KEY / SENDGRID_API_KEY   API key (one is required)
-  MAIL_TO     recipient(s), comma-separated   (default: tusvo.dev@gmail.com)
-  MAIL_FROM   sender                           (default: onboarding@resend.dev)
-
-Usage:
-  python3 scripts/send_report.py --subject "..." --body-file report.txt
-  python3 scripts/send_report.py --subject "..." --body-file report.txt --html-file report.html
-  echo "body" | python3 scripts/send_report.py --subject "..."
-"""
+"""Send the daily gold report by email over an HTTPS API."""
 import argparse
 import json
 import os
@@ -26,13 +7,14 @@ import sys
 import urllib.request
 import urllib.error
 
-DEFAULT_TO = "tusvo.dev@gmail.com"
+DEFAULT_TO = "tuvo.dev@gmail.com"
 DEFAULT_FROM = "Gold Watch <onboarding@resend.dev>"
 
-headers = {"User-Agent": "Mozilla/5.0 (gold-watch)", **headers}
 
 def _post(url, headers, payload):
     data = json.dumps(payload).encode("utf-8")
+    # Cloudflare chặn User-Agent mặc định của Python (403 "error code: 1010")
+    headers = {"User-Agent": "Mozilla/5.0 (gold-watch)", **headers}
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
